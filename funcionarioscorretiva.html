@@ -1,0 +1,1613 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 120%;
+            height: 110%;
+            overflow: hidden; /* Impede rolagem desnecessária */
+            transform: scale(0.47); /* Aplica o nível de zoom desejado */
+            transform-origin: top left; /* Mantém o ponto de origem no canto superior esquerdo */
+            width: 230%; /* Ajusta a largura para compensar a escala */
+            height: 215%; /* Ajusta a altura para compensar a escala */
+            touch-action: none; /* Impede gestos de zoom no celular */
+        }
+    </style>
+</head>
+<body>
+
+
+    
+    <title>Dashboard de Funcionários - WMOLDES</title>
+    
+    <!-- Manifest para PWA --> <link rel="manifest" href="manifest.json"> 
+    <!-- Ícones para Android/iOS --> <link rel="apple-touch-icon" href="icon-192x192.png"> <link rel="icon" sizes="192x192" href="icon-192x192.png"> <meta name="mobile-web-app-capable" content="yes"> <meta name="apple-mobile-web-app-capable" content="yes"> <meta name="theme-color" content="#007BFF"> <style>
+        /* Estilos Gerais do Modo Dark (padrão) */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #282828;
+            color: white;
+            margin: 3px;
+            overflow: hidden; /* Impede o scroll ao ampliar o card */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Título e Subtítulo */
+        .header-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 60px;
+            color: #007BFF; /* Azul */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+            margin-right: 20px;
+        }
+
+        .subtitle {
+            font-size: 40px;
+            color: white;
+        }
+
+        /* Estilos dos Turnos */
+        .shift-container {
+            margin-bottom: 17px;
+        }
+
+        .shift-container h3 {
+            color: #007BFF;
+            margin-bottom: 20px;
+            font-size: 22px;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Estilos dos Cards */
+        .dashboard-container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 20px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .card {
+            background-color: #333;
+            color: white;
+            border-radius: 8px;
+            padding: 20px;
+            width: auto;
+            height: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            
+            
+            cursor: pointer;
+            display: inline-block;         
+        }
+
+        .card img {
+            width: 220px; % auto
+            height: 90px;
+            object-fit: contain;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 3px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #007BFF;
+            font-size: 15px;
+            margin-bottom: 7px;
+        }
+        
+       
+
+        .card p {
+            margin: 5px 0;
+            word-wrap: break-word;
+        }
+
+
+        .card:hover {
+     scale(1.95); /* Mantém o deslocamento ao ampliar */
+    transform-origin: center; /* Garante que a ampliação ocorra a partir do centro */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), 0 0 13px #2f2f2f;
+    border: 1.5px solid #333333;
+}
+
+
+        /* Estilo do modo Light (mantendo todas as propriedades) */
+        .light-mode {
+            background-color: #e6e6e6;
+            color: black;
+        }
+
+        .light-mode .title {
+            color: #333333; /* Mantém a cor preta */
+            text-shadow: none; /* Remove sombra de texto para o modo claro */
+        }
+
+        .light-mode .subtitle {
+            color: black;
+        }
+
+        .light-mode .shift-container h3 {
+            color: #333333;
+        }
+
+        .light-mode .card {
+            background-color: #f3f3f3;
+            color: black;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .light-mode .card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.0), 0 0 13px #2f2f2f;
+        }
+        
+        .light-mode .search-container button {
+        padding: 10px 25px;
+        margin-left: 10px;
+        background-color: #2484e0;
+        color: Black;
+        border: none;
+        border-radius: 30px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.1ms ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+
+        /* Botão de Alternância de Tema */
+        .theme-toggle {
+            position: fixed;
+            top: 1px;
+            left: 21%;
+            transform: translateX(-43%);
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 23px 45px;
+            cursor: pointer;
+            font-size: 29px;
+            z-index: 1000;
+            transition: background-color 0.1s ease, color 0.1ms ease;
+        }
+
+        .light-mode .theme-toggle {
+            background-color: #333333;
+            color: white;
+        }
+
+        /* Overlay de Transição */
+        .transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 80%);
+            opacity: 0;
+            z-index: 999;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .light-mode-transition .transition-overlay {
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 80%);
+            opacity: 1;
+        }
+
+        .dark-mode-transition .transition-overlay {
+            background: radial-gradient(circle, rgba(0, 0, 0, 0.8) 0%, transparent 70%);
+            opacity: 1;
+        }
+
+        /* Efeito de Desfoque */
+        .blurred {
+            filter: blur(3px);
+            transition: filter 0.6s ease;
+        }
+
+        /* Efeito de zoom e sombra 3D com borda neon ao passar o mouse */
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), 0 0 13px #007BFF; /* Efeito de sombra com neon */
+            border: 0.5px solid #e2e2e2; /* Borda branca neon */r
+        }
+
+        /* Estilo para card ampliado */
+        .card.zoomed {
+            position: fixed;
+            top: 50%;
+            left: 44%;
+            transform: translate(-50%, -50%) scale(2.8); /* Centraliza e amplia o card */
+            z-index: 10;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6, 0  20px #333333;
+        }
+
+        /* Fundo desfocado */
+        .blurred-background {
+            filter: blur(3px);
+            transition: opacity 0.5s ease;
+        }        
+
+        .shift-container.blurred-background {
+            pointer-events: none; /* Desabilita interações no fundo desfocado */
+            opacity: 0; /* Torna os títulos invisíveis ao fundo */
+        }
+
+        /* Estilos dos botões do carrossel */
+        .carousel-button {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 7px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .carousel-container:hover .carousel-button {
+            opacity: 1;
+        }
+
+// Função para rolar o carrossel
+function scrollCarousel(direction) {
+    const carousel = document.querySelector('.carousel-content'); // Seleciona o contêiner do carrossel
+    const scrollAmount = 220; // Defina a quantidade de pixels que o carrossel vai rolar
+
+    if (direction === 'left') {
+        carousel.scrollBy({
+            left: -scrollAmount,
+            behavior: 'smooth' // Rola suavemente
+        });
+    } else if (direction === 'right') {
+        carousel.scrollBy({
+            left: scrollAmount,
+            behavior: 'smooth' // Rola suavemente
+        });
+    }
+}
+
+// Adiciona um ouvinte de eventos para detectar as setas do teclado
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'ArrowLeft') {
+        scrollCarousel('left');  // Rola para a esquerda
+    } else if (event.key === 'ArrowRight') {
+        scrollCarousel('right');  // Rola para a direita
+    }
+});
+
+
+        /* Estilos adicionais para suportar diferentes resoluções */
+        @media screen and (max-width: 524px) {
+            .card {
+                width: 280px;
+                height: a; /* Ajuste a altura automática */
+            }
+
+            body {
+                overflow-y: auto; /* Permite scroll vertical em telas menores */
+                overflow-x: auto; /* Permite scroll horizontal em telas menores */
+            }
+        }
+        
+        
+        
+    </style>
+    <script>
+
+                  
+        
+        // Função que controla o zoom e o efeito de desfoque
+function toggleZoom(card) {
+    const zoomedCard = document.querySelector('.card.zoomed'); // Seleciona o card ampliado, se existir
+    const allSections = document.querySelectorAll('.shift-container'); // Seleciona todas as seções (Manhã, Tarde, Noite)
+    
+    if (zoomedCard && zoomedCard !== card) {
+        zoomedCard.classList.remove('zoomed'); // Remove o zoom do card anterior
+        zoomedCard.querySelector('.additional-img').style.opacity = 0; // Oculta a imagem adicional do card anterior
+        allSections.forEach(section => section.classList.remove('blurred-background')); // Remove o desfoque do fundo
+    }
+
+    if (card.classList.contains('zoomed')) {
+        card.classList.remove('zoomed'); // Se o card está ampliado, ele volta ao normal
+        card.querySelector('.additional-img').style.opacity = 0; // Oculta a imagem adicional
+        allSections.forEach(section => section.classList.remove('blurred-background')); // Remove o desfoque do fundo
+    } else {
+        card.classList.add('zoomed'); // Amplia o card
+        card.querySelector('.additional-img').style.opacity = 1; // Exibe a imagem adicional
+        allSections.forEach(section => section.classList.add('blurred-background')); // Aplica o desfoque no fundo
+        card.closest('.shift-container').classList.remove('blurred-background'); // Remove o desfoque da seção ativa
+    }
+}
+
+// Evento de clique na página
+document.addEventListener('click', function(event) {
+    const zoomedCard = document.querySelector('.card.zoomed'); // Seleciona o card ampliado
+    const allSections = document.querySelectorAll('.shift-container'); // Seleciona todas as seções
+    
+    // Se existir um card ampliado e o clique for fora dele, o card volta ao normal
+    if (zoomedCard && !zoomedCard.contains(event.target)) {
+        zoomedCard.classList.remove('zoomed'); // Remove o zoom do card
+        zoomedCard.querySelector('.additional-img').style.opacity = 0; // Oculta a imagem adicional
+        allSections.forEach(section => section.classList.remove('blurred-background')); // Remove o desfoque do fundo
+    }
+});
+
+        // Função que filtra os funcionários com base na busca
+function filtrarFuncionarios() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase(); // Captura o termo de busca e converte para minúsculo
+    const cards = document.querySelectorAll('.card'); // Seleciona todos os cards
+
+    cards.forEach(card => {
+        let nome = '';
+        let cargo = '';
+        let turma = '';
+        let id = '';
+        let ferias = '';
+
+        // Verifica se os elementos existem antes de acessar o .textContent
+        if (card.querySelector('.nome')) {
+            nome = card.querySelector('.nome').textContent.toLowerCase();
+        }
+        if (card.querySelector('.cargo')) {
+            cargo = card.querySelector('.cargo').textContent.toLowerCase();
+        }
+        if (card.querySelector('.Turma')) {
+            Turma = card.querySelector('.Turma').textContent.toLowerCase();
+        }
+        if (card.querySelector('.id')) {
+            drt = card.querySelector('.id').textContent.toLowerCase();
+        }
+        if (card.querySelector('.ferias')) {
+            ferias = card.querySelector('.ferias').textContent.toLowerCase();
+        }
+
+        // Verifica se o termo de busca está presente em qualquer um dos campos
+        if (nome.includes(searchTerm) || cargo.includes(searchTerm) || Turma.includes(searchTerm) || drt.includes(searchTerm) || ferias.includes(searchTerm)) {
+            card.style.display = "block"; // Exibe o card se houver correspondência
+        } else {
+            card.style.display = "none"; // Oculta o card se não houver correspondência
+        }
+    });
+}
+
+document.addEventListener('click', function(event) {
+    const card = document.querySelector('.shift-container');
+    
+    // Verifica se o clique foi fora do card
+    if (!card.contains(event.target)) {
+        card.classList.remove('active'); // Remove a classe ativa para que o card volte à posição inicial
+    }
+});
+
+
+
+
+    </script>
+</head>
+<body>
+    
+  
+   
+
+ <script>
+    // Criação do botão
+    const button = document.createElement('button');
+    button.id = 'closeButton';
+    button.textContent = 'X';
+    document.body.appendChild(button);
+
+    // Estilos do botão
+    const styles = `
+        #closeButton {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #3c99f3;
+            color: #f3f3f3;
+            border: none;
+            padding: 22px;
+            font-size: 19px;
+            cursor: pointer;
+            border-radius: 90%;
+            overflow: hidden;
+        }
+
+        #closeButton::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 45%;
+            border: 1.5px solid #ADD8E6;
+            box-sizing: border-box;
+            animation: rotate 1.5s linear infinite;
+        }
+
+        @keyframes rotate {
+           30% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    `;
+
+    // Adiciona estilos ao documento
+    const styleSheet = document.createElement('style');
+    styleSheet.type = 'text/css';
+    styleSheet.innerText = styles;
+    document.head.appendChild(styleSheet);
+
+    // Evento de fechamento da janela
+    button.addEventListener('click', function () {
+        window.close();
+    });
+</script>
+
+
+
+<script>
+    // Criação do botão fullscreen com animação de borda
+    const fullscreenButton = document.createElement('button');
+    fullscreenButton.id = 'fullscreen-btn';
+    fullscreenButton.textContent = 'Tela cheia';
+    document.body.appendChild(fullscreenButton);
+
+    // Estilos do botão e borda animada aplicados diretamente via script
+    fullscreenButton.style.position = 'relative';
+    fullscreenButton.style.padding = '20px 60px';
+    fullscreenButton.style.fontSize = '35px';
+    fullscreenButton.style.backgroundColor = '#3c85f3';
+    fullscreenButton.style.color = '#f3f3f3';
+    fullscreenButton.style.border = 'none';
+    fullscreenButton.style.cursor = 'pointer';
+    fullscreenButton.style.overflow = 'hidden';
+
+
+    // Criação do div da borda animada
+    const animatedBorder = document.createElement('div');
+    animatedBorder.style.position = 'absolute';
+    animatedBorder.style.top = '0';
+    animatedBorder.style.left = '0';
+    animatedBorder.style.width = '100%';
+    animatedBorder.style.height = '100%';
+    animatedBorder.style.border = '1px solid #333'; // Borda cinza escuro
+    animatedBorder.style.boxSizing = 'border-box';
+    animatedBorder.style.pointerEvents = 'none'; // Não interfere no clique
+    animatedBorder.style.animation = 'border-animate 2.5s linear infinite';
+
+    // Adiciona o div da borda animada ao botão
+    fullscreenButton.appendChild(animatedBorder);
+
+    // Adiciona os keyframes de animação ao documento
+    const fullscreenStyleSheet = document.createElement('style');
+    fullscreenStyleSheet.type = 'text/css';
+    fullscreenStyleSheet.innerText = `
+        @keyframes border-animate {
+            0% { border-color: #3f63ff; } /* Cinza escuro */
+            50% { border-color: #ADD8E6; } /* Azul claro */
+            100% { border-color: #0e1538; }
+        }
+    `;
+    document.head.appendChild(fullscreenStyleSheet);
+
+    // Função que ativa o fullscreen e ajusta o zoom
+    fullscreenButton.addEventListener('click', function() {
+        // Colocar a página em fullscreen
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+        } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+            document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+            document.documentElement.msRequestFullscreen();
+        }
+        
+        // Ajustar o zoom da página para 100%
+        document.body.style.zoom = "100%";
+    });
+</script>
+    <style>
+    /* Deixa a imagem adicional invisível inicialmente */
+    .additional-img {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    /* Estilo para quando o card está ampliado */
+    .card.zoomed .additional-img {
+        display: block;
+        opacity: 1;
+    }
+</style>
+    
+    <!-- Header com o Título e Subtítulo -->
+    <div class="header-container">
+        <h1 class="title">WMOLDES</h1>
+        <h2 class="subtitle">Funcionários -  Manutenção Corretiva</h2>
+    </div>
+
+<script>
+    function adjustResolution() {
+        const content = document.getElementById('content');
+        
+        if (document.fullscreenElement) {
+            content.style.width = '1280px';
+            content.style.height = '720px';
+        } else {
+            content.style.width = '1240px';
+            content.style.height = '680px';
+        }
+    }
+
+    document.addEventListener('fullscreenchange', adjustResolution);
+    document.addEventListener('webkitfullscreenchange', adjustResolution); // Suporte para Safari
+    document.addEventListener('mozfullscreenchange', adjustResolution);    // Suporte para Firefox
+    document.addEventListener('MSFullscreenChange', adjustResolution);     // Suporte para IE/Edge
+</script>
+
+
+  <!-- Campo de Busca -->
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="Buscar funcionário por Nome, DRT, Função, Letra ou Férias." onkeyup="filtrarFuncionarios()">
+    <button onclick="filtrarFuncionarios()">Buscar</button>
+</div>
+
+<style>
+/* Estilização do campo de busca */
+.search-container {
+    margin: 12px 0;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+}
+
+.search-container input[type="text"] {
+    
+    Min-width: 1500px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 32px;
+    outline: none;
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    color: blue;  /* Cor do texto em modo claro */
+}
+
+/* Estilos para modo escuro */
+@media (prefers-color-scheme: dark) {
+    .search-container input[type="text"] {
+        color: Blue;  /* Texto azul em modo escuro */
+    }
+}
+
+/* Para garantir que o texto seja legível com fundo claro */
+@media (prefers-color-scheme: light) {
+    .search-container input[type="text"] {
+        color: #5697d3;  /* Texto preto em modo claro */
+        text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4);  /* Contorno do texto */
+    }
+}
+
+/* Animação de borda */
+.search-container .glow-border {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: calc(100% + 5px);
+    height: calc(100% + 5px);
+    border-radius: 5px;
+    background: linear-gradient(90deg, transparent, blue, transparent);
+    background-size: 100% 0%;
+    z-index: 0;
+    pointer-events: none;
+    animation: glowEffect 1s linear infinite;
+}
+
+/* Animação do efeito de glow */
+@keyframes glowEffect {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 0%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+/* Exemplo de como adicionar a borda no HTML */
+.search-container {
+    position: relative;
+}
+
+.search-container input[type="text"] {
+    position: relative;
+}
+
+.search-container::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
+    border-radius: 2px;
+    background: linear-gradient(99deg, transparent, black, transparent);
+    background-size: 100% 0%;
+    z-index: 0;
+    pointer-events: none;
+    animation: glowEffect 1s linear infinite;
+}
+
+    /* Estilização aprimorada do botão */
+    .search-container button {
+        padding: 10px 25px;
+        margin-left: 10px;
+        background-color: #2484e0;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.1ms ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .search-container button::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300%;
+        height: 300%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: all 0.1ms ease;
+        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(0);
+    }
+
+    .search-container button:hover::before {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    .search-container button:hover {
+        background-color: #1b2429;
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Responsividade */
+    @media (max-width: 600px) {
+        .search-container input[type="text"] {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .search-container button {
+            width: 100%;
+            margin-top: 10px;
+        }
+    }
+</style>
+
+    </div>
+    
+     <button class="theme-toggle" id="theme-toggle">Modo Claro</button>
+
+    <!-- Overlay de Transição -->
+    <div class="transition-overlay"></div>
+
+    <script>
+        const themeToggleButton = document.getElementById('theme-toggle');
+        const body = document.body;
+        const overlay = document.querySelector('.transition-overlay');
+
+        themeToggleButton.addEventListener('click', function() {
+            const isLightMode = body.classList.contains('light-mode');
+            
+            // Aplica a transição de desfoque e overlay de brilho/escurecimento
+            body.classList.add('blurred');
+            overlay.classList.add(isLightMode ? 'dark-mode-transition' : 'light-mode-transition');
+            
+            setTimeout(() => {
+                // Alterna entre os modos Dark e Light
+                body.classList.toggle('light-mode');
+                themeToggleButton.textContent = body.classList.contains('light-mode') ? 'Modo Escuro' : 'Modo Claro';
+                
+                // Remove os efeitos de transição
+                body.classList.remove('blurred');
+                overlay.classList.remove('dark-mode-transition', 'light-mode-transition');
+            }, 500); // Tempo de duração da animação
+        });
+         </script>
+         
+         
+
+</body>
+</html>
+
+    <!-- Turno da Manhã -->
+    <div class="shift-container">
+        <h3>Manhã</h3>
+        <div class="dashboard-container">
+            
+			<div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203850/Belo_iyk221.png" alt="Foto de perfil">
+                <h2 class="nome"> Edson Barbosa</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 79</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Lider</p>
+                <p class="Turma"><span class="info-label">Turma:</span> Diaria </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> FEVEREIRO/2025 </p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11985033598</p>
+                  <p class="Start"><span class="info-label">Data de Admissão:</span> xx/xx/xxxx</p>
+                 
+                <img class="additional-img" src="T:\vit\M.M.Corretiva\Nova pasta\QR Code\QREdsonBarbosa.png" alt="Documento adicional">
+            </div> 
+			
+               <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203840/Thiago_ws0jpu.png" alt="Foto de perfil">
+                <h2 class="nome"> Thiago de Sousa Silva</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 87</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Lider</p>
+                <p class="Turma"><span class="info-label">Turma:</span> A3 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> DEZEMBRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 95104-7967</p>
+                  <p class="Start"><span class="info-label">Data de Admissão:</span> xx/xx/xxxx</p>
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511951047967')">               
+            </div>                       
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203072/Almiro_rntcol.png" alt="Foto de perfil">
+                <h2 class="nome"> Almiro Pereira Coelho</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 86</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Lider</p>
+                <p class="Turma"><span class="info-label">Turma:</span> A1 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> ABRIL/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98888-2706</p>
+                  <p class="Start"><span class="info-label">Data de Admissão:</span> xx/xx/xxxx</p>
+                 
+                <img class="additional-img" src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739286284/Alm-1024_bdzje5.png" alt="Documento adicional" onclick="window.open('https://wa.me/5511988882706')">
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203840/Paulo_wioerw.png" alt="Foto de perfil">
+                <h2 class="nome"> Paulo Sergio M. Brito</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 85</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> A2 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> SETEMBRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98339-6935</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+               
+                 
+                <img class="additional-img" src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739291991/Paulo-1024_1_noo21o.png" alt="Documento adicional" onclick="window.open('https://wa.me/5511983396935')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739292616/JoseLeandro_vprmx6.png" alt="Foto de perfil">
+                <h2 class="nome">José Leandro de Moura Nogueira </h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 257</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador</p>
+                <p class="Turma"><span class="info-label">Turma:</span>A3</p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> JUNHO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 96329-0107</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> 19/12/2022</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511963290107', '_blank')">
+                
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203842/Lucas_qgen2p.png" alt="Foto de perfil">
+                <h2 class="nome"> LUCAS APARECIDO VIERA GOMES DA SILVA</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 229</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> POLIDOR</p>
+                <p class="Turma"><span class="info-label">Turma:</span> A4 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MAIO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 91418-1170</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511914181170', '_blank')">
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203262/Adriano_iooc0c.png" alt="Foto de perfil">
+                <h2 class="nome"> Adriano Felix Dos Santos</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 343</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Carregador/Foscador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> A3 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> AGOSTO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98323-2845</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511983232845')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203851/Ricardo_setvod.png" alt="Foto de perfil">
+                <h2 class="nome"> Antonio Ricardo De Sousa Nascimento</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 315</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Polidor</p>
+                <p class="Turma"><span class="info-label">Turma:</span> A2 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> DEZ/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 97840-7928</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511978407928')"> 
+            </div>
+            
+                        
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203854/Rogerio_sx3tna.png" alt="Foto de perfil">
+                <h2 class="nome"> Rogério Seraphim Ribeiro Da Silva</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 370</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Carregador/Foscador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> A1 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MAIO/2026</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 97027-9727</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511970279727')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203840/Rivelino_Pato_l5tzi0.png" alt="Foto de perfil">
+                <h2 class="nome"> Riverino Vieira Pinto</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 97</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Polidor</p>
+                <p class="Turma"><span class="info-label">Turma:</span> A1 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> NOV/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98709-1515</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511987091515')"> 
+            </div>
+            
+                         
+                        
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203848/Fernando_y6zqh5.png" alt="Foto de perfil">
+                <h2 class="nome"> FERNANDO SILVEIRA DIAS SILVA</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 206</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> a4 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> Julho/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 95824-9241</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="T:\vit\M.M.Corretiva\Nova pasta\QR Code\QRFERNANDO SILVEIRA DIAS SILVA.png" alt="Documento adicional" onclick="window.open('https://wa.me/5511958249241')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739285168/chico_g3c9vw.png" alt="Foto de perfil">
+                <h2 class="nome"> Francisco Saraiva Lima</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 81 </p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> A4 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> JANEIRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 4392-4550 </p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional">
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203842/Lukinhas_juf15l.png" alt="Foto de perfil">
+                <h2 class="nome"> Lucas Santos Dourado</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 165</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador Neck</p>
+                <p class="Turma"><span class="info-label">Turma:</span> a3 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> Dezembro/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 95280-6168</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511952806168')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="LINK DO CAMINHO DA FOTO DE PERFIL" alt="Foto de perfil">
+                <h2 class="nome"> Luiz Henrique Dos Santos Oliveira</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 272</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Carregador/Foscador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> a2 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> ABRIL/2026</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 93008-4076</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511930084076')"> 
+            </div>
+					
+			<div class="card" onclick="toggleZoom(this)">
+                <img src="LINK DO CAMINHO DA FOTO DE PERFIL" alt="Foto de perfil">
+                <h2 class="nome"> Luiz Henrique Dos Santos Oliveira</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 272</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Carregador/Foscador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> a2 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> ABRIL/2026</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 93008-4076</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511930084076')"> 
+            </div>
+  
+            
+            <!-- Adicione mais cards aqui conforme necessário -->
+        </div>
+    </div>
+
+    <!-- Turno da Tarde -->
+    <div class="shift-container">
+        <h3>Tarde</h3>
+        <div class="dashboard-container">
+         <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203839/Sergio_wu8qts.png" alt="Foto de perfil">
+                <h2 class="nome"> Sergio  Luis Custodio</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 80</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Lider</p>
+                <p class="Turma"><span class="info-label">Turma:</span> B3 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> FEVEREIRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 94766-8371</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739292026/Sergio-1024_pkk5rd.png" alt="Documento adicional" onclick="window.open('https://wa.me/5511947668371')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203841/Manoel_Bob_nz7lne.png" alt="Foto de perfil">
+                <h2 class="nome"> MANOEL XAVIER JUNIOR </h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 94</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> B2 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MAIO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98349-7088</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739378694/Bob-1024_ld5rou.png" alt="Documento adicional" onclick="window.open('https://wa.me/5511983497088')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203849/Edvaldo_Barros_mse5qv.png" alt="Foto de perfil">
+                <h2 class="nome"> Edivaldo Barros Da Silva</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 78</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Lider</p>
+                <p class="Turma"><span class="info-label">Turma:</span> B1 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> JANEIRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98554-3906</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739378479/Dio-1024_la9qpv.png" alt="Documento adicional" onclick="window.open('https://wa.me/5511985543906')"> 
+            </div>
+            
+             <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203231/Alberto_jpkqae.png" alt="Foto de perfil">
+                <h2 class="nome"> Alberto Santos De Souza</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 208</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador Neckring</p>
+                <p class="Turma"><span class="info-label">Turma:</span> B1 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> FEVEREIRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 95982-7508 </p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739378479/Alberto-1024_tshxib.png" alt="Documento adicional" onclick="window.open('https://wa.me/5511959827508')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203846/Hagi_bshqkb.png" alt="Foto de perfil">
+                <h2 class="nome"> Nome Funcionario</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 249</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Polidor</p>
+                <p class="Turma"><span class="info-label">Turma:</span> B3 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MARÇO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98913-7393 </p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511989137393')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203845/Josue_twi6lw.png" alt="Foto de perfil">
+                <h2 class="nome"> Josué</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 39 </p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> AJUSTADOR</p>
+                <p class="Turma"><span class="info-label">Turma:</span> B1 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> ABRIL/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 96647-9645 </p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511966479645')"> 
+            </div>
+            
+			
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203841/Leonardo_diaifx.png" alt="Foto de perfil">
+                <h2 class="nome"> Leonardo Augusto Barros Da Silva</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 294 </p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Polidor</p>
+                <p class="Turma"><span class="info-label">Turma:</span> B3 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> JULHO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 99793-1113</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511997931113')"> 
+            </div>
+			
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203288/Ademir_omzvs0.png" alt="Foto de perfil">
+                <h2 class="nome"> Ademir Costa Mendes</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 93</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Polidor</p>
+                <p class="Turma"><span class="info-label">Turma:</span> B2 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> JANEIRO/2026</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98450-0882</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511984500882')"> 
+            </div>
+			
+			<div class="card" onclick="toggleZoom(this)">
+                <img src="T:\vit\M.M.Corretiva\Nova pasta\Foto de Perfil\ANGELO FERNANDES RICCI.png" alt="Foto de perfil">
+                <h2 class="nome"> Angelo</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 222</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> B3 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> JULHO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 99679-0074</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional">
+            </div>
+			
+			<div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203847/Gustavo_mgmwct.png" alt="Foto de perfil">
+                <h2 class="nome"> Gustavo Rodrigues</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 230</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Polidor</p>
+                <p class="Turma"><span class="info-label">Turma:</span> B1 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> ABRIL/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 96597-0337</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511965970337')"> 
+            </div>
+			
+			<div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203839/Severino_lzs94g.png" alt="Foto de perfil">
+                <h2 class="nome"> Severino</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 171</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Polidor</p>
+                <p class="Turma"><span class="info-label">Turma:</span> B4 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> JUNHO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 94863-7716</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511948637716')"> 
+            </div>
+            
+			
+			
+			<div class="card" onclick="toggleZoom(this)">
+                <img src="fotooooooo caminho" alt="Foto de perfil">
+                <h2 class="nome"> Otavio Gonçalves Dos Santos</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 364</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Carregador/Foscador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> b4 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> OUTUBRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 981709358</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511981709358')"> 
+            </div>
+			
+			<div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203844/Jose_carlos_je7qrn.png" alt="Foto de perfil">
+                <h2 class="nome"> José Carlos Pereira Alves</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 339</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Carregador/Foscador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> B1 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> ABRIL/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98731-1565 </p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511987311565')"> 
+            </div>
+            
+            
+            <!-- Adicione mais cards aqui conforme necessário -->
+        </div>
+    </div>
+
+    <!-- Turno da Noite -->
+    <div class="shift-container">
+        <h3>Noite</h3>
+        <div class="dashboard-container">
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="T:\vit\M.M.Corretiva\Nova pasta\Foto de Perfil\anderson.png" alt="Foto de perfil">
+                <h2 class="nome"> Anderson Andrade Cabral</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 101</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Lider</p>
+                <p class="Turma"><span class="info-label">Turma:</span> C3 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> NOVEMBRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98287-3351</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739378479/Anderson-1024_khziut.png" alt="Documento adicional" onclick="window.open('https://wa.me/5511982873351')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203843/Manoel_Trigueiro_aet6ee.png" alt="Foto de perfil">
+                <h2 class="nome"> Manoel Trigueiro</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 83</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> C4 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> FEVEREIRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98212-7773 </p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511982127773')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203844/Jose_Antonio_qcmmhf.png" alt="Foto de perfil">
+                <h2 class="nome"> José Antonio Da Silva</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 83</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Lider</p>
+                <p class="Turma"><span class="info-label">Turma:</span> C1 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> ABRIL/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98212-7773</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511982127773')"> 
+            </div>
+            
+             <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203841/Marcio_wd1p4o.png" alt="Foto de perfil">
+                <h2 class="nome"> Marcio</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 227</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Polidor</p>
+                <p class="Turma"><span class="info-label">Turma:</span> C3 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> SETEMBRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 99533-2568 </p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511995332568')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203840/Ricardo_Deodato_blyjyr.png" alt="Foto de perfil">
+                <h2 class="nome"> Ricardo Deodato Da Silva</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 191</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Polidor</p>
+                <p class="Turma"><span class="info-label">Turma:</span> C1 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> JULHO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 97439-4427</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511974394427')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203840/Roberto_vimcwu.png" alt="Foto de perfil">
+                <h2 class="nome"> Roberto Carvalho Da Silva</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 131</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> C2 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> NOVEMBRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 96030-1057</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511960301057')"> 
+            </div>
+            
+             <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203848/Eric_itydzm.png" alt="Foto de perfil">
+                <h2 class="nome"> Eric Gabriel De Souza </h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 280</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Polidor</p>
+                <p class="Turma"><span class="info-label">Turma:</span> C4 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> FEVEREIRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 95196-6644</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511951966644')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203843/Luciano_imnp93.png" alt="Foto de perfil">
+                <h2 class="nome"> Luciano Nogueira Silva</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 92</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Polidor</p>
+                <p class="Turma"><span class="info-label">Turma:</span> c3 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> JANEIRO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 97255-7265</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511972557265')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203841/Ouro_b8hxco.png" alt="Foto de perfil">
+                <h2 class="nome"> Orlando</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 90 </p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> c3 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> JUNHO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 95114-6417</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511951146417')"> 
+            </div>
+            
+             <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203847/Eugenio_ppwdhh.png" alt="Foto de perfil">
+                <h2 class="nome"> Eugenio</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 84 </p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador</p>
+                <p class="Turma"><span class="info-label">Turma:</span> C4 </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MARÇO/2025</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> 11 98430-5656</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/5511984305656')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203848/Fabricio_hc2vnd.png" alt="Foto de perfil">
+                <h2 class="nome"> Fabricio Vital Da Mata</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> 195 </p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> Ajustador Neckring</p>
+                <p class="Turma"><span class="info-label">Turma:</span> APENAS O NUMERO </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MES/ANO DAS FERIAS</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> NUMERO DO TEL</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/55119')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203845/Jackson_jm23j1.png" alt="Foto de perfil">
+                <h2 class="nome"> Jackson</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> numero do DRT</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> FUNÇÃO EXERCITA</p>
+                <p class="Turma"><span class="info-label">Turma:</span> APENAS O NUMERO </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MES/ANO DAS FERIAS</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> NUMERO DO TEL</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/55119')"> 
+            </div>
+            
+             <div class="card" onclick="toggleZoom(this)">
+                <img src="T:\vit\M.M.Corretiva\Nova pasta\Foto de Perfil\JOAO.png" alt="Foto de perfil">
+                <h2 class="nome"> Joâo</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> numero do DRT</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> FUNÇÃO EXERCITA</p>
+                <p class="Turma"><span class="info-label">Turma:</span> APENAS O NUMERO </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MES/ANO DAS FERIAS</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> NUMERO DO TEL</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional">
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="https://res.cloudinary.com/dy62pz5r7/image/upload/v1739203841/Lucas2_gevcfy.png" alt="Foto de perfil">
+                <h2 class="nome"> Lucas Souza Martins</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> numero do DRT</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> FUNÇÃO EXERCITA</p>
+                <p class="Turma"><span class="info-label">Turma:</span> APENAS O NUMERO </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MES/ANO DAS FERIAS</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> NUMERO DO TEL</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/number')"> 
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="LINK DO CAMINHO DA FOTO DE PERFIL" alt="Foto de perfil">
+                <h2 class="nome"> Nome Funcionario</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> numero do DRT</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> FUNÇÃO EXERCITA</p>
+                <p class="Turma"><span class="info-label">Turma:</span> APENAS O NUMERO </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MES/ANO DAS FERIAS</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> NUMERO DO TEL</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional" onclick="window.open('https://wa.me/number')"> 
+            </div>
+            
+             <div class="card" onclick="toggleZoom(this)">
+                <img src="LINK DO CAMINHO DA FOTO DE PERFIL" alt="Foto de perfil">
+                <h2 class="nome"> Nome Funcionario</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> numero do DRT</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> FUNÇÃO EXERCITA</p>
+                <p class="Turma"><span class="info-label">Turma:</span> APENAS O NUMERO </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MES/ANO DAS FERIAS</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> NUMERO DO TEL</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional">
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="LINK DO CAMINHO DA FOTO DE PERFIL" alt="Foto de perfil">
+                <h2 class="nome"> Nome Funcionario</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> numero do DRT</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> FUNÇÃO EXERCITA</p>
+                <p class="Turma"><span class="info-label">Turma:</span> APENAS O NUMERO </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MES/ANO DAS FERIAS</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> NUMERO DO TEL</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional">
+            </div>
+            
+            <div class="card" onclick="toggleZoom(this)">
+                <img src="LINK DO CAMINHO DA FOTO DE PERFIL" alt="Foto de perfil">
+                <h2 class="nome"> Nome Funcionario</h2>
+                
+                <p class="id"><span class="info-label">DRT:</span> numero do DRT</p>
+                
+                <p class="cargo"><span class="info-label">Função:</span> FUNÇÃO EXERCITA</p>
+                <p class="Turma"><span class="info-label">Turma A:</span> APENAS O NUMERO </p>
+                
+                <p class="ferias"><span class="info-label">Férias:</span> MES/ANO DAS FERIAS</p>
+                
+                 <p class="Telefone"><span class="info-label">Telefone:</span> NUMERO DO TEL</p>
+                 <p class="Start"><span class="info-label">Data de Admissão:</span> dia/mes/ano</p>
+                 
+                 
+                <img class="additional-img" src="documento1.jpg" alt="Documento adicional">
+            </div>
+            
+            <!-- Adicione mais cards aqui conforme necessário -->
+        </div>
+    </div>
+</body>
+</html>
