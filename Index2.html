@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMOLDES - Gestão de Funcionários</title>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import { getDatabase, ref, onValue, push, update, remove } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBYhDq9AFP5LH_sSXUCCg8xLnTihtRBcI",
+            authDomain: "lista-funcionariosmmc.firebaseapp.com",
+            databaseURL: "https://lista-funcionariosmmc-default-rtdb.firebaseio.com",
+            projectId: "lista-funcionariosmmc",
+            storageBucket: "lista-funcionariosmmc.firebasestorage.app",
+            messagingSenderId: "249740902307",
+            appId: "1:249740902307:web:4664282a020725571be416"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        window.firebaseDatabase = database;
+        window.firebaseRef = ref;
+        window.firebaseOnValue = onValue;
+        window.firebasePush = push;
+        window.firebaseUpdate = update;
+        window.firebaseRemove = remove;
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2>WMOLDES</h2>
+            <p>Carregando sistema...</p>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="modal">
+        <div class="modal-content admin-modal">
+            <div class="modal-header">
+                <h3>Acesso Administrativo</h3>
+                <button class="close-modal" onclick="fecharModalLogin()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Senha de Administrador</label>
+                    <input type="password" id="admin-password" class="form-input" placeholder="Digite a senha">
+                </div>
+                <p id="login-error" class="error-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModalLogin()">Cancelar</button>
+                <button class="btn btn-primary" onclick="verificarSenhaAdmin()">Acessar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Modal -->
+    <div id="funcionario-modal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Adicionar Funcionário</h3>
+                <button class="close-modal" onclick="fecharModalFuncionario()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome Completo *</label>
+                        <input type="text" id="edit-nome" class="form-input" placeholder="Nome do funcionário">
+                    </div>
+                    <div class="form-group">
+                        <label>DRT *</label>
+                        <input type="text" id="edit-drt" class="form-input" placeholder="Número da DRT">
+                    </div>
+                    <div class="form-group">
+                        <label>Função *</label>
+                        <select id="edit-funcao" class="form-select">
+                            <option value="">Selecione a função</option>
+                            <option value="Lider">Lider</option>
+                            <option value="Ajustador">Ajustador</option>
+                            <option value="Ajustador/Soldador">Ajustador/Soldador</option>
+                            <option value="Polidor">Polidor</option>
+                            <option value="Carregador/Foscador">Carregador/Foscador</option>
+                            <option value="Vertech">Vertech</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Turno *</label>
+                        <select id="edit-turno" class="form-select">
+                            <option value="">Selecione o turno</option>
+                            <option value="Manhã">Manhã</option>
+                            <option value="Tarde">Tarde</option>
+                            <option value="Noite">Noite</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Turma *</label>
+                        <select id="edit-turma" class="form-select">
+                            <option value="">Selecione a turma</option>
+                            <option value="A1">A1</option>
+                            <option value="A2">A2</option>
+                            <option value="A3">A3</option>
+                            <option value="A4">A4</option>
+                            <option value="B1">B1</option>
+                            <option value="B2">B2</option>
+                            <option value="B3">B3</option>
+                            <option value="B4">B4</option>
+                            <option value="C1">C1</option>
+                            <option value="C2">C2</option>
+                            <option value="C3">C3</option>
+                            <option value="C4">C4</option>
+                            <option value="Diaria">Diária</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Férias</label>
+                        <select id="edit-ferias" class="form-select">
+                            <option value="">Não informado</option>
+                            <option value="JANEIRO/2024">JANEIRO/2024</option>
+                            <option value="FEVEREIRO/2024">FEVEREIRO/2024</option>
+                            <option value="MARÇO/2024">MARÇO/2024</option>
+                            <option value="ABRIL/2024">ABRIL/2024</option>
+                            <option value="MAIO/2024">MAIO/2024</option>
+                            <option value="JUNHO/2024">JUNHO/2024</option>
+                            <option value="JULHO/2024">JULHO/2024</option>
+                            <option value="AGOSTO/2024">AGOSTO/2024</option>
+                            <option value="SETEMBRO/2024">SETEMBRO/2024</option>
+                            <option value="OUTUBRO/2024">OUTUBRO/2024</option>
+                            <option value="NOVEMBRO/2024">NOVEMBRO/2024</option>
+                            <option value="DEZEMBRO/2024">DEZEMBRO/2024</option>
+                            <option value="JANEIRO/2025">JANEIRO/2025</option>
+                            <option value="FEVEREIRO/2025">FEVEREIRO/2025</option>
+                            <option value="MARÇO/2025">MARÇO/2025</option>
+                            <option value="ABRIL/2025">ABRIL/2025</option>
+                            <option value="MAIO/2025">MAIO/2025</option>
+                            <option value="JUNHO/2025">JUNHO/2025</option>
+                            <option value="JULHO/2025">JULHO/2025</option>
+                            <option value="AGOSTO/2025">AGOSTO/2025</option>
+                            <option value="SETEMBRO/2025">SETEMBRO/2025</option>
+                            <option value="OUTUBRO/2025">OUTUBRO/2025</option>
+                            <option value="NOVEMBRO/2025">NOVEMBRO/2025</option>
+                            <option value="DEZEMBRO/2025">DEZEMBRO/2025</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone *</label>
+                        <input type="text" id="edit-telefone" class="form-input" placeholder="(11) 99999-9999">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Admissão</label>
+                        <input type="date" id="edit-admissao" class="form-input">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>URL da Foto (Opcional)</label>
+                        <input type="text" id="edit-foto" class="form-input" placeholder="https://exemplo.com/foto.jpg">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModalFuncionario()">Cancelar</button>
+                <button class="btn btn-danger" id="excluir-funcionario" style="display: none;" onclick="excluirFuncionario()">Excluir</button>
+                <button class="btn btn-primary" id="salvar-funcionario" onclick="salvarFuncionario()">Salvar Funcionário</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">W</div>
+                    <div class="logo-text">
+                        <h1>WMOLDES</h1>
+                        <span>Manutenção Corretiva</span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3>DASHBOARD</h3>
+                    <button class="nav-item active" onclick="scrollToSection('dashboard')">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">Visão Geral</span>
+                    </button>
+                </div>
+
+                <div class="nav-section">
+                    <h3>FUNCIONÁRIOS</h3>
+                    <button class="nav-item" onclick="scrollToSection('manha')">
+                        <span class="nav-icon">🌅</span>
+                        <span class="nav-text">Turno Manhã</span>
+                    </button>
+                    <button class="nav-item" onclick="scrollToSection('tarde')">
+                        <span class="nav-icon">🌇</span>
+                        <span class="nav-text">Turno Tarde</span>
+                    </button>
+                    <button class="nav-item" onclick="scrollToSection('noite')">
+                        <span class="nav-icon">🌃</span>
+                        <span class="nav-text">Turno Noite</span>
+                    </button>
+                </div>
+
+                <div class="nav-section">
+                    <h3>FÉRIAS</h3>
+                    <button class="nav-item" onclick="scrollToSection('ferias-proximas')">
+                        <span class="nav-icon">⏰</span>
+                        <span class="nav-text">Próximas Férias</span>
+                    </button>
+                    <button class="nav-item" onclick="scrollToSection('ferias-atual')">
+                        <span class="nav-icon">🏖️</span>
+                        <span class="nav-text">Férias Atuais</span>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">U</div>
+                    <div class="user-details">
+                        <span class="user-name">Usuário</span>
+                        <span class="user-role" id="user-role">Visitante</span>
+                    </div>
+                </div>
+                <button class="btn-admin" id="admin-access-btn" onclick="abrirModalLogin()">
+                    <span class="btn-icon">🔐</span>
+                    Acesso Admin
+                </button>
+                <div class="admin-controls" id="admin-controls" style="display: none;">
+                    <button class="btn-admin" onclick="abrirModalNovoFuncionario()">
+                        <span class="btn-icon">➕</span>
+                        Novo Funcionário
+                    </button>
+                    <button class="btn-admin" onclick="exportarDados()">
+                        <span class="btn-icon">📊</span>
+                        Exportar Dados
+                    </button>
+                    <button class="btn-admin btn-logout" onclick="sairModoAdmin()">
+                        <span class="btn-icon">🚪</span>
+                        Sair do Admin
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="header-actions">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Buscar funcionários..." onkeyup="aplicarFiltros()">
+                        <button class="search-btn" onclick="aplicarFiltros()">
+                            <span>🔍</span>
+                        </button>
+                    </div>
+                    <div class="header-controls">
+                        <button class="theme-toggle" id="theme-toggle" onclick="alternarTema()">
+                            <span class="theme-icon">🌙</span>
+                        </button>
+                        <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">
+                            <span>⛶</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <select id="filter-turno" onchange="aplicarFiltros()">
+                            <option value="todos">Todos os Turnos</option>
+                            <option value="Manhã">Manhã</option>
+                            <option value="Tarde">Tarde</option>
+                            <option value="Noite">Noite</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select id="filter-funcao" onchange="aplicarFiltros()">
+                            <option value="todos">Todas as Funções</option>
+                            <option value="Lider">Lider</option>
+                            <option value="Ajustador">Ajustador</option>
+                            <option value="Ajustador/Soldador">Ajustador/Soldador</option>
+                            <option value="Polidor">Polidor</option>
+                            <option value="Carregador/Foscador">Carregador/Foscador</option>
+                            <option value="Vertech">Vertech</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select id="filter-turma" onchange="aplicarFiltros()">
+                            <option value="todos">Todas as Turmas</option>
+                            <option value="A1">A1</option>
+                            <option value="A2">A2</option>
+                            <option value="A3">A3</option>
+                            <option value="A4">A4</option>
+                            <option value="B1">B1</option>
+                            <option value="B2">B2</option>
+                            <option value="B3">B3</option>
+                            <option value="B4">B4</option>
+                            <option value="C1">C1</option>
+                            <option value="C2">C2</option>
+                            <option value="C3">C3</option>
+                            <option value="C4">C4</option>
+                            <option value="Diaria">Diária</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select id="filter-ferias" onchange="aplicarFiltros()">
+                            <option value="todos">Status Férias</option>
+                            <option value="feriados">De Férias</option>
+                            <option value="proximos">Próximas Férias</option>
+                            <option value="atrasadas">Férias Atrasadas</option>
+                            <option value="este-mes">Férias Este Mês</option>
+                            <option value="nao-informado">Não Informado</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn-reset" onclick="resetarFiltros()">
+                        <span>🔄</span>
+                        Limpar
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section">
+                <div class="section-header">
+                    <h2>Visão Geral</h2>
+                    <div class="section-actions">
+                        <span class="last-update" id="last-update"></span>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon primary">👥</div>
+                        <div class="stat-info">
+                            <h3>Total de Funcionários</h3>
+                            <span class="stat-number" id="total-funcionarios">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon success">🏖️</div>
+                        <div class="stat-info">
+                            <h3>Férias Este Mês</h3>
+                            <span class="stat-number" id="ferias-mes-atual">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon warning">📅</div>
+                        <div class="stat-info">
+                            <h3>Próximas Férias</h3>
+                            <span class="stat-number" id="proximas-ferias">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon danger">⚠️</div>
+                        <div class="stat-info">
+                            <h3>Férias Atrasadas</h3>
+                            <span class="stat-number" id="ferias-atrasadas">0</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-chart">
+                            <div class="chart-label">Distribuição por Turno</div>
+                            <div class="chart-bars">
+                                <div class="chart-bar">
+                                    <div class="bar-label">Manhã</div>
+                                    <div class="bar-container">
+                                        <div class="bar-fill" id="bar-manha" style="width: 0%"></div>
+                                    </div>
+                                    <div class="bar-value" id="value-manha">0</div>
+                                </div>
+                                <div class="chart-bar">
+                                    <div class="bar-label">Tarde</div>
+                                    <div class="bar-container">
+                                        <div class="bar-fill" id="bar-tarde" style="width: 0%"></div>
+                                    </div>
+                                    <div class="bar-value" id="value-tarde">0</div>
+                                </div>
+                                <div class="chart-bar">
+                                    <div class="bar-label">Noite</div>
+                                    <div class="bar-container">
+                                        <div class="bar-fill" id="bar-noite" style="width: 0%"></div>
+                                    </div>
+                                    <div class="bar-value" id="value-noite">0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Férias Sections -->
+            <section id="ferias-proximas" class="section">
+                <div class="section-header">
+                    <h2>Próximas Férias</h2>
+                    <span class="section-subtitle">Funcionários com férias nos próximos 60 dias</span>
+                </div>
+                <div class="cards-grid" id="proximas-ferias-container">
+                    <!-- Cards serão inseridos via JavaScript -->
+                </div>
+            </section>
+
+            <section id="ferias-atual" class="section">
+                <div class="section-header">
+                    <h2>Férias em Andamento</h2>
+                    <span class="section-subtitle">Funcionários de férias este mês</span>
+                </div>
+                <div class="cards-grid" id="ferias-mes-container">
+                    <!-- Cards serão inseridos via JavaScript -->
+                </div>
+            </section>
+
+            <!-- Turnos Sections -->
+            <section id="manha" class="section">
+                <div class="section-header">
+                    <h2>Turno da Manhã</h2>
+                    <div class="section-stats">
+                        <span class="stat-badge" id="count-manha">0 funcionários</span>
+                        <span class="stat-badge ferias" id="ferias-manha">0 de férias</span>
+                    </div>
+                </div>
+                <div class="cards-grid" id="cards-manha">
+                    <!-- Cards serão inseridos via JavaScript -->
+                </div>
+            </section>
+
+            <section id="tarde" class="section">
+                <div class="section-header">
+                    <h2>Turno da Tarde</h2>
+                    <div class="section-stats">
+                        <span class="stat-badge" id="count-tarde">0 funcionários</span>
+                        <span class="stat-badge ferias" id="ferias-tarde">0 de férias</span>
+                    </div>
+                </div>
+                <div class="cards-grid" id="cards-tarde">
+                    <!-- Cards serão inseridos via JavaScript -->
+                </div>
+            </section>
+
+            <section id="noite" class="section">
+                <div class="section-header">
+                    <h2>Turno da Noite</h2>
+                    <div class="section-stats">
+                        <span class="stat-badge" id="count-noite">0 funcionários</span>
+                        <span class="stat-badge ferias" id="ferias-noite">0 de férias</span>
+                    </div>
+                </div>
+                <div class="cards-grid" id="cards-noite">
+                    <!-- Cards serão inseridos via JavaScript -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
